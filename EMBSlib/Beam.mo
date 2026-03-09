@@ -10,7 +10,7 @@ model Beam "A Beam"
 inner Modelica.Mechanics.MultiBody.World world(
  label2="z",
  g=9.81,
- n(displayUnit="1")={0,0,-1},
+ n(each displayUnit="1")={0,0,-1},
      animateGravity=false)    annotation(Placement(transformation(extent={{-80,0},
              {-60,20}})));
 Modelica.Mechanics.MultiBody.Joints.Revolute revolute1(

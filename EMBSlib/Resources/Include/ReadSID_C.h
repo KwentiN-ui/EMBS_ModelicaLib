@@ -61,6 +61,18 @@ typedef struct{
   SID_Data* sid;
 } extObj;
 
+// Index helper functions
+//=================================
+
+static inline int matrix2Index(int r, int c, int numR, int numC)
+{
+	return (r - 1) * numC + c - 1;
+}
+
+static inline int matrix3Index(int r, int q, int c, int numR, int numQ, int numC)
+{
+	return (q - 1) * numC * numR + (r - 1)*numC + c - 1;
+}
 
 //printing
 //=================================
@@ -123,7 +135,7 @@ int getNextInteger(char* line, int startToken, int* value) {
 		}
 		i++;
 	}
-	v = atoi(&intTokens);
+	v = atoi(intTokens);
 	*value = v;
 	if (found)
 		return i;
@@ -173,8 +185,8 @@ int getNextReal(char* line, int startToken, double* value) {
 		}
 		i++;
 	}
-	base = atof(&baseToken);
-	exponent = atof(&exponentToken);
+	base = atof(baseToken);
+	exponent = atof(exponentToken);
 	d = base * pow(10, exponent);
 	*value = d;
 	if (found)
@@ -227,18 +239,6 @@ taylor initTaylor(int order, int nr, int ncol, int nq, int nqn, int structure) {
 		t.Mn = calloc(t.nrow*t.nqn*t.ncol, sizeof(double));
 	return t;
 }
-
-int matrix2Index(int r, int c, int numR, int numC)
-{
-	return (r - 1) * numC + c - 1;
-}
-
-int matrix3Index(int r, int q, int c, int numR, int numQ, int numC)
-{
-	return (q - 1) * numC * numR + (r - 1)*numC + c - 1;
-}
-
-
 
 taylor parseTaylor(char* line, int bufferSize, FILE* file) {
 	int order = 0;
@@ -442,11 +442,11 @@ void* SIDFileConstructor_C(const char* fileName)
 		ModelicaFormatMessage("Could not open %s\n", fileName);
 	}
 	sid = calloc(1, sizeof(SID_Data));
-	ModelicaFormatMessage("Allocated SID struct of size %d\n", sizeof(SID_Data));
+	ModelicaFormatMessage("Allocated SID struct of size %zu\n", sizeof(SID_Data));
 
 	//read line by line ( http://openbook.rheinwerk-verlag.de/c_von_a_bis_z/016_c_ein_ausgabe_funktionen_016.htm#mjcea47bd6d32a4a8f51be329a672845d7 )
 	bufferSize = 512;
-	line = malloc(sizeof(char*) * 512);
+	line = malloc(sizeof(char) * 512);
 
 	init = 0;
 	while (fgets(line, bufferSize, sidFile) != NULL) {
@@ -576,7 +576,7 @@ void getM0(void* p_sid, const char* taylorName, double* m0, size_t nr, size_t nc
 	SID_Data* sid = (SID_Data*)p_sid;
 	taylor t = getTaylorByName((sid), taylorName);
 	if(!((int)nr==t.nrow && (int)nc==t.ncol)){
-		ModelicaFormatMessage(" getM0: %s the given dimensions [%d, %d] are not equal to the stored matrix dimension [%d %d]\n",taylorName, nr, nc, t.nrow,t.ncol);
+		ModelicaFormatMessage(" getM0: %s the given dimensions [%zu, %zu] are not equal to the stored matrix dimension [%d %d]\n",taylorName, nr, nc, t.nrow,t.ncol);
 	}
 	else{
 		int s = sizeof(double)*(int)nr*(int)nc;
@@ -590,7 +590,7 @@ void getM1(void* p_sid, const char* taylorName, double* m1, size_t nr, size_t nq
 	taylor t = getTaylorByName((sid), taylorName);
 
 	if((int)nr!=t.nrow || (int)nc!=t.ncol || (int)nq!=t.nq){
-		ModelicaFormatMessage(" getM1: the given dimensions [%d, %d, %d] are not equal to the stored matrix dimension [%d, %d, %d]\n",nr,nq,nc, t.nrow,t.nq,t.ncol);
+		ModelicaFormatMessage(" getM1: the given dimensions [%zu, %zu, %zu] are not equal to the stored matrix dimension [%d, %d, %d]\n",nr,nq,nc, t.nrow,t.nq,t.ncol);
 	}
 	else{
 	  int s = sizeof(double)*(int)nr*(int)nc*(int)nq;
@@ -609,7 +609,7 @@ void getM0Node(void* p_sid, const char* taylorName, int nodeIdx, double* m0, siz
 	n = sid->nodes[nodeIdx-1];
 	t = getNodeTaylorByName(&n, taylorName);
 	if((int)nr!=t.nrow || (int)nc!=t.ncol){
-		ModelicaFormatMessage(" getM0Node: the given dimensions [%d, %d] are not equal to the stored matrix dimension [%d %d]\n", nr, nc, t.nrow,t.ncol);
+		ModelicaFormatMessage(" getM0Node: the given dimensions [%zu, %zu] are not equal to the stored matrix dimension [%d %d]\n", nr, nc, t.nrow,t.ncol);
 	}
 	else{
 	  int s = sizeof(double)*(int)nr*(int)nc;
@@ -630,7 +630,7 @@ void getM1Node(void* p_sid, const char* taylorName, int nodeIdx, double* m1, siz
 	t = getNodeTaylorByName(&n, taylorName);
 			
 	if((int)nr!=t.nrow || (int)nc!=t.ncol || (int)nq!=t.nq){
-		ModelicaFormatMessage(" getM1: the given dimensions [%d, %d, %d] are not equal to the stored matrix dimension [%d, %d, %d]\n",nr,nq,nc, t.nrow,t.nq,t.ncol);
+		ModelicaFormatMessage(" getM1: the given dimensions [%zu, %zu, %zu] are not equal to the stored matrix dimension [%d, %d, %d]\n",nr,nq,nc, t.nrow,t.nq,t.ncol);
 	}
 	else{
 	  int s = sizeof(double)*(int)nr*(int)nc*(int)nq;
@@ -638,5 +638,3 @@ void getM1Node(void* p_sid, const char* taylorName, int nodeIdx, double* m1, siz
 	}
 
 }
-
-

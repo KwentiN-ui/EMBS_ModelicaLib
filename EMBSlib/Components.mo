@@ -27,19 +27,19 @@ package Components
   Real q[nq](start=zeros(nq)) "modal coordinates";
   Real qd[nq](start=zeros(nq))=der(q);
   Real qdd[nq](start=zeros(nq))=der(qd);
-  Modelica.SIunits.Position r_0[3](start={0,0,0})=frame_ref.r_0
+  Modelica.Units.SI.Position r_0[3](start={0,0,0})=frame_ref.r_0
         "position of frame of reference";
-  Modelica.SIunits.Velocity v[3]=der(r_0) "velocity of frame of reference";
-  Modelica.SIunits.Velocity v_0[3]=Modelica.Mechanics.MultiBody.Frames.resolve2(frame_ref.R,der(r_0))
+  Modelica.Units.SI.Velocity v[3]=der(r_0) "velocity of frame of reference";
+  Modelica.Units.SI.Velocity v_0[3]=Modelica.Mechanics.MultiBody.Frames.resolve2(frame_ref.R,der(r_0))
         "velocity of frame of reference solved in body reference frame";
-  Modelica.SIunits.Acceleration a[3]=Modelica.Mechanics.MultiBody.Frames.resolve2(frame_ref.R,der(v))
+  Modelica.Units.SI.Acceleration a[3]=Modelica.Mechanics.MultiBody.Frames.resolve2(frame_ref.R,der(v))
         "acceleration of frame of reference solved in body reference frame";
-  Modelica.SIunits.Acceleration g_0_aux[3]=world.gravityAcceleration(frame_ref.r_0 + Modelica.Mechanics.MultiBody.Frames.resolve1(frame_ref.R,cm[:,1]));
-  Modelica.SIunits.Acceleration g_0[3]=Modelica.Mechanics.MultiBody.Frames.resolve2(frame_ref.R,g_0_aux)
+  Modelica.Units.SI.Acceleration g_0_aux[3]=world.gravityAcceleration(frame_ref.r_0 + Modelica.Mechanics.MultiBody.Frames.resolve1(frame_ref.R,cm[:,1]));
+  Modelica.Units.SI.Acceleration g_0[3]=Modelica.Mechanics.MultiBody.Frames.resolve2(frame_ref.R,g_0_aux)
         "Gravity acceleration resolved in body reference frame";
-  Modelica.SIunits.AngularVelocity omega[3]=Modelica.Mechanics.MultiBody.Frames.angularVelocity2(frame_ref.R);
-  Modelica.SIunits.AngularAcceleration omega_d[3]=der(omega);
-  Modelica.SIunits.AngularVelocity omega_tilde[3,3]={{0, -omega[3],omega[2]},  {omega[3],0,-omega[1]}, {-omega[2],omega[1],0}};
+  Modelica.Units.SI.AngularVelocity omega[3]=Modelica.Mechanics.MultiBody.Frames.angularVelocity2(frame_ref.R);
+  Modelica.Units.SI.AngularAcceleration omega_d[3]=der(omega);
+  Modelica.Units.SI.AngularVelocity omega_tilde[3,3]={{0, -omega[3],omega[2]},  {omega[3],0,-omega[1]}, {-omega[2],omega[1],0}};
   Real M_t[3]=mI*(a-g_0) + transpose(mdCM_tilde)* omega_d + transpose(Ct)* qdd;
   Real k_omega_t[3] = mI*omega_tilde*v_0 + res2_1[:,1];
   Real res2_1[3,1]=omega_tilde*omega_tilde*mdCM; //the derivation of the center of gravity is neglected
@@ -53,22 +53,20 @@ package Components
   Real hd_e[nq]=sum(nodes[i].hde_i for i in 1:numNodes);
 
   Modelica.Blocks.Sources.RealExpression qExp[nq](y=q) annotation(Placement(transformation(extent={{-58,40},{-38,60}})));
-  Modelica.SIunits.Torque[3] t_rest;
-  Modelica.SIunits.Force[3] f_rest;
+  Modelica.Units.SI.Torque[3] t_rest;
+  Modelica.Units.SI.Force[3] f_rest;
   Modelica.Mechanics.MultiBody.Forces.WorldForce force(
-   resolveInFrame=Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b, N_to_m=
-            1000)
+   resolveInFrame=Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b)
               annotation(Placement(transformation(extent={{-86,18},{-66,38}})));
   Modelica.Blocks.Sources.RealExpression f_elast1[nr0](y=f_rest) annotation(Placement(transformation(extent={{-124,16},{-104,36}})));
   Modelica.Mechanics.MultiBody.Forces.WorldTorque torque(
-               resolveInFrame=Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.world, Nm_to_m=
-            1000)
+               resolveInFrame=Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.world)
                annotation(Placement(transformation(extent={{-88,46},{-68,66}})));
   Modelica.Blocks.Sources.RealExpression t_elast2[nr0](y=t_rest) annotation(Placement(transformation(extent={{-124,46},{-104,66}})));
   protected
    parameter EMBSlib.SID_File sid=EMBSlib.SID_File(SIDfileName) annotation(Evaluate=true);
-   parameter Modelica.SIunits.Mass mass=EMBSlib.ExternalFunctions_C.getMass(sid);
-   parameter Modelica.SIunits.Mass mI[nr0,nr0]=identity(nr0)*mass;
+   parameter Modelica.Units.SI.Mass mass=EMBSlib.ExternalFunctions_C.getMass(sid);
+   parameter Modelica.Units.SI.Mass mI[nr0,nr0]=identity(nr0)*mass;
    parameter Real mdCM_M0[nr0,1]=EMBSlib.ExternalFunctions_C.getM0( sid, "mdCM", nr0, 1) annotation(Evaluate=true);
    parameter Real mdCM_M1[nr0,nq,1]=EMBSlib.ExternalFunctions_C.getM1(sid,   "mdCM", nr0, nq, 1) annotation(Evaluate=true);
    Real mdCM[nr0,1]=EMBSlib.MatrixFunctions.getTaylorFunction(nr0,nq,1,mdCM_M0,mdCM_M1,q);
@@ -154,18 +152,18 @@ package Components
   parameter Real origin_M0[nr0,1]=EMBSlib.ExternalFunctions_C.getM0Node( sid, "origin",nodeArrayIdx, nr0, 1) annotation(Evaluate=true);
   parameter Real origin_M1[nr0,nq,1]=EMBSlib.ExternalFunctions_C.getM1Node(sid, "origin",nodeArrayIdx, nr0, nq, 1) annotation(Evaluate=true);
   Real origin_[nr0,1]=origin_M0;
-  Modelica.SIunits.Position origin[nr0]=origin_[:,1];
+  Modelica.Units.SI.Position origin[nr0]=origin_[:,1];
   parameter Real psi_M0[nr0,nq]=EMBSlib.ExternalFunctions_C.getM0Node( sid, "psi",nodeArrayIdx, nr0, nq) annotation(Evaluate=true);
   parameter Real psi_M1[nr0,nq,nq]=EMBSlib.ExternalFunctions_C.getM1Node(sid, "psi",nodeArrayIdx, nr0, nq, nq) annotation(Evaluate=true);
   Real psi[nr0,nq]=psi_M0;
-  Modelica.SIunits.Angle theta[nr0]=psi*q "elastic rotation";
-  Modelica.SIunits.AngularVelocity der_theta[nr0]=der(theta)
+  Modelica.Units.SI.Angle theta[nr0]=psi*q "elastic rotation";
+  Modelica.Units.SI.AngularVelocity der_theta[nr0]=der(theta)
         "elastic rotation velocity";
   parameter Real phi_M0[nr0,nq]=EMBSlib.ExternalFunctions_C.getM0Node( sid, "phi",nodeArrayIdx, nr0, nq) annotation(Evaluate=true);
   parameter Real phi_M1[nr0,nq,nq]=EMBSlib.ExternalFunctions_C.getM1Node(sid, "phi",nodeArrayIdx, nr0, nq, nq) annotation(Evaluate=true);
   Real phi[nr0,nq]=phi_M0;
-  Modelica.SIunits.Position u[nr0]=phi*q "elastic displacement";
-  Modelica.SIunits.Position u_abs=Modelica.Math.Vectors.length(u);
+  Modelica.Units.SI.Position u[nr0]=phi*q "elastic displacement";
+  Modelica.Units.SI.Position u_abs=Modelica.Math.Vectors.length(u);
   parameter Real AP_M0[nr0,nr0]=EMBSlib.ExternalFunctions_C.getM0Node( sid, "AP", nodeArrayIdx, nr0, nr0) annotation(Evaluate=true);
   parameter Real AP_M1[nr0,nq,nr0]=EMBSlib.ExternalFunctions_C.getM1Node(sid, "AP",nodeArrayIdx, nr0, nq, nr0) annotation(Evaluate=true);
   Real AP[nr0,nr0]=EMBSlib.MatrixFunctions.getTaylorFunction(nr0,nq,nr0,AP_M0,zeros(nr0,nq,nr0),q);
@@ -181,10 +179,10 @@ package Components
    transformation(extent={{-122,-22},{-82,18}}),
    iconTransformation(extent={{-122,-22},{-82,18}})));
   Real q_d[nq]=der(q);
-  Modelica.SIunits.Force f[nr0]=frame_b.f "external force applied";
-  Modelica.SIunits.Torque t[nr0]=frame_b.t "external torque applied";
-  Modelica.SIunits.Force hde_i[nq]=transpose(phi)*f+transpose(psi)*t;
-  parameter Modelica.SIunits.Diameter sphereDiameter=world.defaultBodyDiameter
+  Modelica.Units.SI.Force f[nr0]=frame_b.f "external force applied";
+  Modelica.Units.SI.Torque t[nr0]=frame_b.t "external torque applied";
+  Modelica.Units.SI.Force hde_i[nq]=transpose(phi)*f+transpose(psi)*t;
+  parameter Modelica.Units.SI.Diameter sphereDiameter=world.defaultBodyDiameter
         "Diameter of sphere"                                                                        annotation(Dialog(
    group="if animation = true",
    tab="Animation",
@@ -273,19 +271,19 @@ package Components
   Real q[nq](start=zeros(nq)) "modal coordinates";
   Real qd[nq](start=zeros(nq))=der(q);
   Real qdd[nq](start=zeros(nq))=der(qd);
-  Modelica.SIunits.Position r_0[3](start={0,0,0})=frame_ref.r_0
+  Modelica.Units.SI.Position r_0[3](start={0,0,0})=frame_ref.r_0
         "position of frame of reference";
-  Modelica.SIunits.Velocity v[3]=der(r_0) "velocity of frame of reference";
-  Modelica.SIunits.Velocity v_0[3]=Modelica.Mechanics.MultiBody.Frames.resolve2(frame_ref.R,der(r_0))
+  Modelica.Units.SI.Velocity v[3]=der(r_0) "velocity of frame of reference";
+  Modelica.Units.SI.Velocity v_0[3]=Modelica.Mechanics.MultiBody.Frames.resolve2(frame_ref.R,der(r_0))
         "velocity of frame of reference solved in body reference frame";
-  Modelica.SIunits.Acceleration a[3]=Modelica.Mechanics.MultiBody.Frames.resolve2(frame_ref.R,der(v))
+  Modelica.Units.SI.Acceleration a[3]=Modelica.Mechanics.MultiBody.Frames.resolve2(frame_ref.R,der(v))
         "acceleration of frame of reference solved in body reference frame";
-  Modelica.SIunits.Acceleration g_0_aux[3]=world.gravityAcceleration(frame_ref.r_0 + Modelica.Mechanics.MultiBody.Frames.resolve1(frame_ref.R,cm[:,1]));
-  Modelica.SIunits.Acceleration g_0[3]=Modelica.Mechanics.MultiBody.Frames.resolve2(frame_ref.R,g_0_aux)
+  Modelica.Units.SI.Acceleration g_0_aux[3]=world.gravityAcceleration(frame_ref.r_0 + Modelica.Mechanics.MultiBody.Frames.resolve1(frame_ref.R,cm[:,1]));
+  Modelica.Units.SI.Acceleration g_0[3]=Modelica.Mechanics.MultiBody.Frames.resolve2(frame_ref.R,g_0_aux)
         "Gravity acceleration resolved in body reference frame";
-  Modelica.SIunits.AngularVelocity omega[3]=Modelica.Mechanics.MultiBody.Frames.angularVelocity2(frame_ref.R);
-  Modelica.SIunits.AngularAcceleration omega_d[3]=der(omega);
-  Modelica.SIunits.AngularVelocity omega_tilde[3,3]={{0, -omega[3],omega[2]},  {omega[3],0,-omega[1]}, {-omega[2],omega[1],0}};
+  Modelica.Units.SI.AngularVelocity omega[3]=Modelica.Mechanics.MultiBody.Frames.angularVelocity2(frame_ref.R);
+  Modelica.Units.SI.AngularAcceleration omega_d[3]=der(omega);
+  Modelica.Units.SI.AngularVelocity omega_tilde[3,3]={{0, -omega[3],omega[2]},  {omega[3],0,-omega[1]}, {-omega[2],omega[1],0}};
   Real M_t[3]=mI*(a-g_0) + transpose(mdCM_tilde)* omega_d + transpose(Ct)* qdd;
   Real k_omega_t[3] = mI*omega_tilde*v_0 + res2_1[:,1];
   Real res2_1[3,1]=omega_tilde*omega_tilde*mdCM; //the derivation of the center of gravity is neglected
@@ -299,22 +297,20 @@ package Components
   Real hd_e[nq]=sum(nodes[i].hde_i for i in 1:numNodes);
 
   Modelica.Blocks.Sources.RealExpression qExp[nq](y=q) annotation(Placement(transformation(extent={{-58,40},{-38,60}})));
-  Modelica.SIunits.Torque[3] t_rest;
-  Modelica.SIunits.Force[3] f_rest;
+  Modelica.Units.SI.Torque[3] t_rest;
+  Modelica.Units.SI.Force[3] f_rest;
   Modelica.Mechanics.MultiBody.Forces.WorldForce force(
-   resolveInFrame=Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b, N_to_m=
-            1000)
+   resolveInFrame=Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b)
               annotation(Placement(transformation(extent={{-86,18},{-66,38}})));
   Modelica.Blocks.Sources.RealExpression f_elast1[nr0](y=f_rest) annotation(Placement(transformation(extent={{-124,16},{-104,36}})));
   Modelica.Mechanics.MultiBody.Forces.WorldTorque torque(
-               resolveInFrame=Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.world, Nm_to_m=
-            1000)
+               resolveInFrame=Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.world)
                annotation(Placement(transformation(extent={{-88,46},{-68,66}})));
   Modelica.Blocks.Sources.RealExpression t_elast2[nr0](y=t_rest) annotation(Placement(transformation(extent={{-124,46},{-104,66}})));
   protected
    parameter EMBSlib.SID_File sid=EMBSlib.SID_File(SIDfileName) annotation(Evaluate=true);
-   parameter Modelica.SIunits.Mass mass=EMBSlib.ExternalFunctions_C.getMass(sid);
-   parameter Modelica.SIunits.Mass mI[nr0,nr0]=identity(nr0)*mass;
+   parameter Modelica.Units.SI.Mass mass=EMBSlib.ExternalFunctions_C.getMass(sid);
+   parameter Modelica.Units.SI.Mass mI[nr0,nr0]=identity(nr0)*mass;
    parameter Real mdCM_M0[nr0,1]=EMBSlib.ExternalFunctions_C.getM0( sid, "mdCM", nr0, 1) annotation(Evaluate=true);
    parameter Real mdCM_M1[nr0,nq,1]=EMBSlib.ExternalFunctions_C.getM1(sid,   "mdCM", nr0, nq, 1) annotation(Evaluate=true);
    Real mdCM[nr0,1]=EMBSlib.MatrixFunctions.getTaylorFunction(nr0,nq,1,mdCM_M0,mdCM_M1,q);
