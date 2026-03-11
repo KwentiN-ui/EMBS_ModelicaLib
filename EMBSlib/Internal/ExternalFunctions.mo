@@ -9,6 +9,42 @@ package ExternalFunctions
                LibraryDirectory="modelica://EMBSlib/Resources/Library");
  end getMass;
 
+ function getNumNodes
+  input EMBSlib.Internal.SID_File sid;
+  output Integer numNodes;
+
+  external "C" numNodes=getNumNodes(sid) 
+    annotation(Library="modelica_rust",
+               LibraryDirectory="modelica://EMBSlib/Resources/Library");
+ end getNumNodes;
+
+ function getNumModes
+  input EMBSlib.Internal.SID_File sid;
+  output Integer numModes;
+
+  external "C" numModes=getNumModes(sid) 
+    annotation(Library="modelica_rust",
+               LibraryDirectory="modelica://EMBSlib/Resources/Library");
+ end getNumModes;
+
+ function getNumNodesFromFile
+  input String fileName;
+  output Integer numNodes;
+
+  external "C" numNodes=getNumNodesFromFile(fileName) 
+    annotation(Library="modelica_rust",
+               LibraryDirectory="modelica://EMBSlib/Resources/Library");
+ end getNumNodesFromFile;
+
+ function getNumModesFromFile
+  input String fileName;
+  output Integer numModes;
+
+  external "C" numModes=getNumModesFromFile(fileName) 
+    annotation(Library="modelica_rust",
+               LibraryDirectory="modelica://EMBSlib/Resources/Library");
+ end getNumModesFromFile;
+
  function getM0
   input EMBSlib.Internal.SID_File sid;
   input String taylorName;

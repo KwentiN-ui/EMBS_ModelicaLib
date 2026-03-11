@@ -214,6 +214,78 @@ fn parse_taylor<R: BufRead>(reader: &mut R, first_line: &str) -> Taylor {
     taylor
 }
 
+use std::sync::Mutex;
+use std::collections::HashMap;
+
+static SID_CACHE: Mutex<Option<HashMap<String, (i32, i32)>>> = Mutex::new(None);
+
+fn get_from_cache(file_name: &str) -> Option<(i32, i32)> {
+    let mut cache_lock = SID_CACHE.lock().unwrap();
+    if cache_lock.is_none() {
+        *cache_lock = Some(HashMap::new());
+    }
+    cache_lock.as_ref().unwrap().get(file_name).cloned()
+}
+
+fn add_to_cache(file_name: String, num_nodes: i32, num_modes: i32) {
+    let mut cache_lock = SID_CACHE.lock().unwrap();
+    if cache_lock.is_none() {
+        *cache_lock = Some(HashMap::new());
+    }
+    cache_lock.as_mut().unwrap().insert(file_name, (num_nodes, num_modes));
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn getNumNodesFromFile(file_name_ptr: *const c_char) -> i32 {
+    let file_name = match CStr::from_ptr(file_name_ptr).to_str() {
+        Ok(s) => s,
+        Err(_) => return 0,
+    };
+    if let Some((n, _)) = get_from_cache(file_name) {
+        return n;
+    }
+    // If not in cache, we have to open it briefly
+    let file = match File::open(file_name) {
+        Ok(f) => f,
+        Err(_) => return 0,
+    };
+    let mut reader = BufReader::new(file);
+    let mut line = String::new();
+    if reader.read_line(&mut line).unwrap() > 0 {
+        let ints = find_integers(&line);
+        if ints.len() >= 2 {
+            add_to_cache(file_name.to_string(), ints[0], ints[1]);
+            return ints[0];
+        }
+    }
+    0
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn getNumModesFromFile(file_name_ptr: *const c_char) -> i32 {
+    let file_name = match CStr::from_ptr(file_name_ptr).to_str() {
+        Ok(s) => s,
+        Err(_) => return 0,
+    };
+    if let Some((_, m)) = get_from_cache(file_name) {
+        return m;
+    }
+    let file = match File::open(file_name) {
+        Ok(f) => f,
+        Err(_) => return 0,
+    };
+    let mut reader = BufReader::new(file);
+    let mut line = String::new();
+    if reader.read_line(&mut line).unwrap() > 0 {
+        let ints = find_integers(&line);
+        if ints.len() >= 2 {
+            add_to_cache(file_name.to_string(), ints[0], ints[1]);
+            return ints[1];
+        }
+    }
+    0
+}
+
 #[no_mangle]
 pub unsafe extern "C" fn SIDFileConstructor_C(file_name_ptr: *const c_char) -> *mut c_void {
     let file_name = match CStr::from_ptr(file_name_ptr).to_str() {
@@ -322,6 +394,20 @@ pub unsafe extern "C" fn getMass(p_sid: *mut c_void) -> f64 {
     if p_sid.is_null() { return 0.0; }
     let sid = &*(p_sid as *mut SidData);
     sid.mass
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn getNumNodes(p_sid: *mut c_void) -> i32 {
+    if p_sid.is_null() { return 0; }
+    let sid = &*(p_sid as *mut SidData);
+    sid.num_nodes
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn getNumModes(p_sid: *mut c_void) -> i32 {
+    if p_sid.is_null() { return 0; }
+    let sid = &*(p_sid as *mut SidData);
+    sid.num_modes
 }
 
 fn get_taylor_by_name<'a>(sid: &'a SidData, name: &str) -> Option<&'a Taylor> {
