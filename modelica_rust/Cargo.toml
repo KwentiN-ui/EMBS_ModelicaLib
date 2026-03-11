@@ -1,0 +1,12 @@
+[package]
+name = "modelica_rust"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "modelica_rust"
+crate-type = ["cdylib"]
+
+[dependencies]
+# No dependencies for now, but we might need some for parsing if we want to use a crate.
+# But for now I will use standard Rust.
