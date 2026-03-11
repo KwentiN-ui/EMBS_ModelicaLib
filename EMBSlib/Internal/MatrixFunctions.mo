@@ -1,4 +1,4 @@
-within EMBSlib;
+within EMBSlib.Internal;
 package MatrixFunctions
  function getTaylorFunction
   input Integer nr;

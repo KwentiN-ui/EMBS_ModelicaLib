@@ -1,7 +1,7 @@
-within EMBSlib;
-package ExternalFunctions_C
+within EMBSlib.Internal;
+package ExternalFunctions
  function getMass
-  input EMBSlib.SID_File sid;
+  input EMBSlib.Internal.SID_File sid;
   output Real mass;
 
   external "C" mass=getMass(sid) 
@@ -10,7 +10,7 @@ package ExternalFunctions_C
  end getMass;
 
  function getM0
-  input EMBSlib.SID_File sid;
+  input EMBSlib.Internal.SID_File sid;
   input String taylorName;
   input Integer nr;
   input Integer nc;
@@ -22,7 +22,7 @@ package ExternalFunctions_C
  end getM0;
 
  function getM1
-  input EMBSlib.SID_File sid;
+  input EMBSlib.Internal.SID_File sid;
   input String taylorName;
   input Integer nr;
   input Integer nq;
@@ -35,7 +35,7 @@ package ExternalFunctions_C
  end getM1;
 
  function getM0Node
-  input EMBSlib.SID_File sid;
+  input EMBSlib.Internal.SID_File sid;
   input String taylorName;
   input Integer nodeIdx;
   input Integer nr;
@@ -48,7 +48,7 @@ package ExternalFunctions_C
  end getM0Node;
 
  function getM1Node
-  input EMBSlib.SID_File sid;
+  input EMBSlib.Internal.SID_File sid;
   input String taylorName;
   input Integer nodeIdx;
   input Integer nr;
@@ -60,4 +60,4 @@ package ExternalFunctions_C
     annotation(Library="modelica_rust",
                LibraryDirectory="modelica://EMBSlib/Resources/Library");
  end getM1Node;
-end ExternalFunctions_C;
+end ExternalFunctions;

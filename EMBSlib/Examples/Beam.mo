@@ -1,7 +1,7 @@
-within EMBSlib;
+within EMBSlib.Examples;
 model Beam "A Beam"
  extends Modelica.Icons.Example;
- Components.EMBS_Body eMBS_Body(
+ EMBSlib.Components.EMBS_Body eMBS_Body(
      numModes=4,
      SIDfileName=Modelica.Utilities.Files.loadResource(
          "modelica://EMBSlib/Resources/Data/Beam_3m.SID_FEM"),
@@ -25,7 +25,7 @@ Modelica.Mechanics.MultiBody.Joints.Revolute revolute1(
      height=0.5,
      duration=2)
      annotation (Placement(transformation(extent={{-80,60},{-60,80}})));
- Components.EMBS_Body eMBS_Body2(
+ EMBSlib.Components.EMBS_Body eMBS_Body2(
      numModes=4,
      SIDfileName=Modelica.Utilities.Files.loadResource(
          "modelica://EMBSlib/Resources/Data/Beam_3m.SID_FEM"),

@@ -1,4 +1,4 @@
-within EMBSlib;
+within EMBSlib.Internal;
 class SID_File
  extends ExternalObject;
  function constructor
