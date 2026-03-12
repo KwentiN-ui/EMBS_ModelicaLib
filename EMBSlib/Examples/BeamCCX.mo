@@ -17,5 +17,5 @@ equation
   connect(world.frame_b, eMBS_Body_WithFixedFrame.frame_ref) annotation(
     Line(points = {{-44, 0}, {-34, 0}}, color = {95, 95, 95}));
 annotation(
-    experiment(StartTime = 0, StopTime = 0.2, Tolerance = 1e-06, Interval = 4e-05));
+    experiment(StartTime = 0, StopTime = 0.2, Tolerance = 1e-06, Interval = 2e-05));
 end BeamCCX;
