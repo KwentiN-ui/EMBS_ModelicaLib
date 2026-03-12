@@ -1,0 +1,6 @@
+within EMBSlib.Examples;
+
+model Beam2
+equation
+
+end Beam2;
